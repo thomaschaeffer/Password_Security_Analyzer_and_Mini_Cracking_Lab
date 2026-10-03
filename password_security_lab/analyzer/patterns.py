@@ -141,28 +141,42 @@ def filter_block(dict_block):
     return dict_block_filtered
 
 def detection_date(password):
+    dates_separated=[]
     dates=[]
     years=[]
+    if len(password)>=8:
+        for i in range(len(password)-7):
+            block = password [i:i+8]
+            if block[0:2].isdigit() and not block[2].isalnum() and block[3:5].isdigit() and not block[5].isalnum() and block[6:8].isdigit():
+                day=block[0:2]
+                month=block[3:5]
+                if 1<=int(day)<=31 and 1<=int(month)<=12:
+                        dates_separated.append(block)
+    for i in dates_separated:
+        password = password.replace(i,"")
+
     if len(password)>=6:
         for i in range(len(password)-5):
             block=password[i:i+6]
             if block.isdigit():
                 day=block[0:2]
                 month=block[2:4]
-                if int(day)<=31 and int(month)<=12:
+                if 1<=int(day)<=31 and 1<=int(month)<=12:
                     dates.append(block)
+    for i in dates:
+        password = password.replace(i,"")
+
     if len(password)>=4:
         for i in range(len(password)-3):
             block=password[i:i+4]
             if block.isdigit() and 1900<=int(block)<=2026:
                 years.append(block)
 
-    print(dates,years)
-
+    return dates_separated+dates+years
 
 if __name__=="__main__":
     #print(detection_repetition("abbbcaaaafbbbffbbb"))
     #print(detection_sequence("123456abcdefg1a2b3c4d4444"))
     #print(detection_block("abababab1111"))
     #filter_block(detection_block_bis("abasdfgsfjabababa"))
-    detection_date("a123456")
+    print(detection_date("19122320:11!24"))
