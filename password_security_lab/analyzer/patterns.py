@@ -110,6 +110,17 @@ def detection_block(password):
 
 
 def detection_block_bis(password):
+    '''
+    Dectes repeated blocks, including blocks seprated by other characters
+    
+    Agrs:
+        password (str): password to analyze
+
+    Returns:
+        dict: Detected blocks with their starting positions
+
+    '''
+    
     dict_block={}
 
     for size_block in range(2,len(password)//2+1):
@@ -124,6 +135,16 @@ def detection_block_bis(password):
     return dict_block
 
 def filter_block(dict_block):
+    '''
+    Removes redundants blocks that are covered by larger blocks
+    
+    Args:
+        dict_block (dict): Dected block and their starting positions
+
+    Returns:
+        dict: Filtered blocks
+    
+    '''
     dict_block_filtered=dict_block.copy()
     for k in dict_block.keys():
         for i in dict_block.keys():
@@ -141,9 +162,33 @@ def filter_block(dict_block):
     return dict_block_filtered
 
 def detection_date(password):
+    '''
+    Detects dates and years in the password
+
+    Args:  
+        password (str) : Password to analyze.
+
+    Returns:
+        list: Dected dates and years
+    
+    
+    '''
+    dates_big_format=[]
     dates_separated=[]
     dates=[]
     years=[]
+
+    if len(password)>=10:
+        for i in range(len(password)-9):
+            block = password [i:i+10]
+            if block[0:2].isdigit() and not block[2].isalnum() and block[3:5].isdigit() and not block[5].isalnum() and block[6:10].isdigit():
+                day=block[0:2]
+                month=block[3:5]
+                if 1<=int(day)<=31 and 1<=int(month)<=12:
+                        dates_big_format.append(block)
+    for i in dates_big_format:
+        password = password.replace(i,"")
+
     if len(password)>=8:
         for i in range(len(password)-7):
             block = password [i:i+8]
@@ -169,14 +214,48 @@ def detection_date(password):
     if len(password)>=4:
         for i in range(len(password)-3):
             block=password[i:i+4]
-            if block.isdigit() and 1900<=int(block)<=2026:
+
+            
+        if block.isdigit() and 1900 <= int(block) <= 2026:
+            before_is_digit = i > 0 and password[i-1].isdigit()
+            after_is_digit = i+4 < len(password) and password[i+4].isdigit()
+
+            if not before_is_digit and not after_is_digit:
                 years.append(block)
 
-    return dates_separated+dates+years
+    return dates_big_format+dates_separated+dates+years
+
+def replace_substitutions(password):
+    '''
+    Replaces common password character substitutions with their corresponding letters
+
+    Arg:
+        password (str) : password to analyse.
+
+    Returns:
+        str: Password after having replace all the character substitions with their corresponding letters.
+    
+    '''
+    substitutions = {
+        "@": "a",
+        "4": "a",
+        "3": "e",
+        "1": "i",
+        "!": "i",
+        "0": "o",
+        "$": "s",
+        "5": "s",
+        "7": "t"
+    }
+
+    result = ""
+
+    for char in password.lower():
+        if char in substitutions.keys():
+            result += substitutions[char]
+        else:
+            result += char 
+    return result
 
 if __name__=="__main__":
-    #print(detection_repetition("abbbcaaaafbbbffbbb"))
-    #print(detection_sequence("123456abcdefg1a2b3c4d4444"))
-    #print(detection_block("abababab1111"))
-    #filter_block(detection_block_bis("abasdfgsfjabababa"))
-    print(detection_date("19122320:11!24"))
+    print(detection_sequence("abc123456def"))
