@@ -1,4 +1,5 @@
-from password_security_lab.analyzer.patterns import replace_substitutions
+from patterns import replace_substitutions
+import random
 
 def load_dictionary(path):
 
@@ -21,3 +22,17 @@ def check_dictionary(password, dictionary):
         pos+=1
 
     return False, None, None
+
+
+def mutation_suffix(password):
+    special_characters = [
+    "!", "@", "#", "$", "%", "&", "*",
+    "?", "_", "-", "+", ".", "="
+    ]
+
+    return password+random.choice(special_characters)
+
+
+
+
+print(mutation_suffix("123456789"))
